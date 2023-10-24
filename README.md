@@ -7,7 +7,7 @@ The `cat_widget` module provides two blocks, allowing users to search for detail
 - **Cat Search Widget**: A widget where users can select a cat breed and view details and images related to the selected breed.
 - **Cat Of The Day Block**: A block that shows a different image of a cat each day. You can manually run the cron job to download a new cat image. Users can like or dislike the image.
 - **Media Entity Integration**: A media entity of type `cat_widget_image` is created to manage the images associated with the cat breeds.
-- **Cat Report Page**: A view page where the admin user can check all the cat images with their like/dislike numbers.
+- **Cat Report Page**: A view page where the admin user can check all the cat images with their like/dislike numbers. It can be accessed on this page `/admin/cat-report`.
 
 ## Dependencies:
 
