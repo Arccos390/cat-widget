@@ -1,0 +1,7 @@
+cat_widget.vote:
+  path: '/vote/{media_id}/{vote_type}'
+  defaults:
+    _controller: '\Drupal\cat_widget\Controller\CatWidgetVoteController::vote'
+    _title: 'Cat Widget Vote'
+  requirements:
+    _permission: 'access content'

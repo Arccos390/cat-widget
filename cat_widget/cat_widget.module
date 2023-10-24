@@ -1,0 +1,65 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for Cat Widget module.
+ */
+
+use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\File\FileSystemInterface;
+
+/**
+ * Implements hook_cron().
+ */
+function cat_widget_cron() {
+  $client = \Drupal::httpClient();
+  $file_system = \Drupal::service('file_system');
+  $cat_client = \Drupal::service('cat_widget.cat_client');
+  // Load the cat_client service.
+  $cat_image = $cat_client->random();
+  try {
+    // Get cat image url.
+    $response = $client->get($cat_image[0]['url']);
+    $data = $response->getBody()->getContents();
+    // Check if the url provided an image.
+    $info = getimagesizefromstring($data);
+    if ($info === false) {
+      \Drupal::logger('cat_widget')->error(t('No image found for URL: @url', [
+        '@url' => $cat_image[0]['url']
+      ]));
+      return;
+    }
+    // Get image extension.
+    $extension = image_type_to_extension($info[2]);
+
+    // Create a directory based on the current year and month.
+    $date = new DrupalDateTime('now');
+    $year_month = $date->format('Y-m');
+    $directory = "public://daily_cat_images/{$year_month}/";
+    $file_system->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
+
+    // Save the image.
+    $filename = $cat_image[0]['id'] . $extension;
+    $destination = $directory . $filename;
+    $image_uri = $file_system->saveData($data, $destination, FileSystemInterface::EXISTS_REPLACE);
+    // Create a file entity for the image.
+    $file = \Drupal\file\Entity\File::create([
+      'uri' => $image_uri,
+      'status' => 1,
+      'uid' => 1
+    ]);
+    $file->save();
+    // Create media entity.
+    $media = \Drupal\media\Entity\Media::create([
+      'bundle' => 'cat_widget_image',
+      'field_media_image' => [
+        'target_id' => $file->id(),
+        'alt' => 'Cat of the day'
+      ],
+    ]);
+    $media->setName($filename)->setPublished(TRUE)->save();
+  }
+  catch (\Exception $e) {
+    \Drupal::logger('cat_widget')->error($e);
+  }
+}

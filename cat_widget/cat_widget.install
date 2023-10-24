@@ -1,0 +1,50 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Cat Widget module.
+ */
+
+/**
+ * Implements hook_install().
+ *
+ * Set's up a cron job to run every day at 8AM.
+ */
+function cat_widget_install() {
+  $job = \Drupal\ultimate_cron\Entity\CronJob::create([
+    'id' => 'cat_widget_cron',
+    'title' => 'Daily cat image',
+    'module' => 'cat_widget',
+    'callback' => 'cat_widget_cron',
+    'scheduler' => [
+      'id' => 'crontab',
+      'configuration' => [
+        'rules' => ['0 8 * * *'],
+      ],
+    ],
+  ]);
+  $job->save();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function cat_widget_uninstall() {
+  // Delete the Daily cat cron job.
+  $job = \Drupal::entityTypeManager()->getStorage('ultimate_cron_job')->load('cat_widget_cron');
+  if ($job) {
+    $job->delete();
+  }
+  // Query to get all media items of type cat_widget_image.
+  $query = \Drupal::entityQuery('media')
+    ->condition('bundle', 'cat_widget_image')
+    ->accessCheck(TRUE);
+  $media_ids = $query->execute();
+
+  // Load and delete all the media items.
+  if ($media_ids) {
+    $storage = \Drupal::entityTypeManager()->getStorage('media');
+    $media_items = $storage->loadMultiple($media_ids);
+    $storage->delete($media_items);
+  }
+}

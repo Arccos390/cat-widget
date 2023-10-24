@@ -1,0 +1,8 @@
+name: 'Cat Widget'
+type: module
+description: 'This module provides two widget modes for displaying cats.'
+package: Custom
+core_version_requirement: ^10
+dependencies:
+  - drupal:media
+  - ultimate_cron:ultimate_cron

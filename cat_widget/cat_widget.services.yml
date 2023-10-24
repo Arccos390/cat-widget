@@ -1,0 +1,4 @@
+services:
+  cat_widget.cat_client:
+    class: \Drupal\cat_widget\CatClient
+    arguments: ['@http_client_factory']

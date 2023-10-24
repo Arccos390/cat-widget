@@ -1,0 +1,24 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_vote_down
+    - media.type.cat_widget_image
+id: media.cat_widget_image.field_vote_down
+field_name: field_vote_down
+entity_type: media
+bundle: cat_widget_image
+label: 'Vote down'
+description: ''
+required: true
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  min: 0
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer
